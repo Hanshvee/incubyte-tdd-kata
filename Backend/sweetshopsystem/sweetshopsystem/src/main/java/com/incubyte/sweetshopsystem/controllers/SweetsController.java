@@ -38,11 +38,33 @@ public class SweetsController {
                 return new ResponseEntity<>("Sweet category ID is required and must be a valid integer",
                         HttpStatus.BAD_REQUEST);
             }
+
+            if (!jsonObject.has("stock_quantity") || !isValidStockQuantity(jsonObject.get("stock_quantity"))) {
+                return new ResponseEntity<>("Sweet stock quantity is required and must be a non-negative integer",
+                        HttpStatus.BAD_REQUEST);
+            }
         } catch (JSONException e) {
             return new ResponseEntity<>("Invalid JSON format", HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<>("Sweet created successfully", HttpStatus.CREATED);
+    }
+
+    private boolean isValidStockQuantity(Object stockQuantity) {
+        if (stockQuantity == null) {
+            return false;
+        }
+        if (stockQuantity instanceof Number) {
+            return ((Number) stockQuantity).intValue() >= 0; // Stock quantity can be 0 or positive
+        }
+        if (stockQuantity instanceof String) {
+            try {
+                return Integer.parseInt((String) stockQuantity) >= 0;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
     private boolean isValidCategoryId(Object categoryId) {
