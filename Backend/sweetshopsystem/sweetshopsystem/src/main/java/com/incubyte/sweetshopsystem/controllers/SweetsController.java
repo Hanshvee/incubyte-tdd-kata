@@ -24,10 +24,32 @@ public class SweetsController {
             if (!jsonObject.has("name") || jsonObject.getString("name").trim().isEmpty()) {
                 return new ResponseEntity<>("Sweet name is required", HttpStatus.BAD_REQUEST);
             }
+
+            if (!jsonObject.has("price") || !isValidPrice(jsonObject.get("price"))) {
+                return new ResponseEntity<>("Sweet price is required and must be a valid number",
+                        HttpStatus.BAD_REQUEST);
+            }
         } catch (JSONException e) {
             return new ResponseEntity<>("Invalid JSON format", HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<>("Sweet created successfully", HttpStatus.CREATED);
+    }
+
+    private boolean isValidPrice(Object price) {
+        if (price == null) {
+            return false;
+        }
+        if (price instanceof Number) {
+            return ((Number) price).doubleValue() > 0;
+        }
+        if (price instanceof String) {
+            try {
+                return Double.parseDouble((String) price) > 0;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return false;
     }
 }
