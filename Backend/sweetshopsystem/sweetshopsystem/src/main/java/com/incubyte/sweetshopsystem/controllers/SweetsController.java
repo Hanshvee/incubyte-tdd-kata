@@ -43,6 +43,10 @@ public class SweetsController {
                 return new ResponseEntity<>("Sweet stock quantity is required and must be a non-negative integer",
                         HttpStatus.BAD_REQUEST);
             }
+
+            if (jsonObject.has("image_url") && jsonObject.getString("image_url").trim().isEmpty()) {
+                return new ResponseEntity<>("Sweet image URL cannot be empty if provided", HttpStatus.BAD_REQUEST);
+            }
         } catch (JSONException e) {
             return new ResponseEntity<>("Invalid JSON format", HttpStatus.BAD_REQUEST);
         }
