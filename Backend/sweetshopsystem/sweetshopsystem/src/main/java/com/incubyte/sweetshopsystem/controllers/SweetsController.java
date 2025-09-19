@@ -44,14 +44,27 @@ public class SweetsController {
                         HttpStatus.BAD_REQUEST);
             }
 
-            if (jsonObject.has("image_url") && jsonObject.getString("image_url").trim().isEmpty()) {
-                return new ResponseEntity<>("Sweet image URL cannot be empty if provided", HttpStatus.BAD_REQUEST);
+            if (jsonObject.has("image_url")) {
+                String imageUrl = jsonObject.getString("image_url");
+                if (imageUrl.trim().isEmpty()) {
+                    return new ResponseEntity<>("Sweet image URL cannot be empty if provided", HttpStatus.BAD_REQUEST);
+                }
+                if (!isValidImageUrl(imageUrl)) {
+                    return new ResponseEntity<>("Sweet image URL has an invalid format", HttpStatus.BAD_REQUEST);
+                }
             }
         } catch (JSONException e) {
             return new ResponseEntity<>("Invalid JSON format", HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<>("Sweet created successfully", HttpStatus.CREATED);
+    }
+
+    private boolean isValidImageUrl(String imageUrl) {
+        // Simple regex for URL validation. A more robust solution might use a dedicated
+        // library.
+        String urlRegex = "^(http|https)://[^\s/$.?#].[^\s]*$";
+        return imageUrl.matches(urlRegex);
     }
 
     private boolean isValidStockQuantity(Object stockQuantity) {
