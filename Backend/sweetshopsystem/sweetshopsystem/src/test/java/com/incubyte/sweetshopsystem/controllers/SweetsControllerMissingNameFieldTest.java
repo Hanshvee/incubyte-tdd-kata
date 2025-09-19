@@ -11,17 +11,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SweetsController.class)
-class SweetsControllerEmptyBodyTest {
+class SweetsControllerMissingNameFieldTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    @DisplayName("should return bad request when request body is empty")
-    void shouldReturnBadRequestWhenRequestBodyIsEmpty() throws Exception {
+    @DisplayName("should return bad request when name field is missing")
+    void shouldReturnBadRequestWhenNameFieldIsMissing() throws Exception {
+        String sweetJson = "{\"description\": \"A delicious chocolate sweet\", \"price\": 10.50}";
+
         mockMvc.perform(post("/api/sweets")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(""))
+                .content(sweetJson))
                 .andExpect(status().isBadRequest());
     }
 }
