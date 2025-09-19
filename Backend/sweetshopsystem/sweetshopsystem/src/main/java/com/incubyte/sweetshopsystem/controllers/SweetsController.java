@@ -33,11 +33,33 @@ public class SweetsController {
             if (!jsonObject.has("description") || jsonObject.getString("description").trim().isEmpty()) {
                 return new ResponseEntity<>("Sweet description is required", HttpStatus.BAD_REQUEST);
             }
+
+            if (!jsonObject.has("category_id") || !isValidCategoryId(jsonObject.get("category_id"))) {
+                return new ResponseEntity<>("Sweet category ID is required and must be a valid integer",
+                        HttpStatus.BAD_REQUEST);
+            }
         } catch (JSONException e) {
             return new ResponseEntity<>("Invalid JSON format", HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<>("Sweet created successfully", HttpStatus.CREATED);
+    }
+
+    private boolean isValidCategoryId(Object categoryId) {
+        if (categoryId == null) {
+            return false;
+        }
+        if (categoryId instanceof Number) {
+            return ((Number) categoryId).intValue() > 0; // Category IDs typically start from 1
+        }
+        if (categoryId instanceof String) {
+            try {
+                return Integer.parseInt((String) categoryId) > 0;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
     private boolean isValidPrice(Object price) {
