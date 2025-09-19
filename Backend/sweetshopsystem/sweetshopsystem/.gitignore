@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Spring Boot application properties (contains sensitive credentials)
+src/main/resources/application.properties
+
