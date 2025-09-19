@@ -13,7 +13,9 @@ public class SweetsController {
 
     @PostMapping
     public ResponseEntity<String> createSweet(@RequestBody(required = false) String sweetJson) {
-        // Placeholder to get the test to fail with 400 vs 200
-        return new ResponseEntity<>("Sweet received (placeholder)", HttpStatus.OK);
+        if (sweetJson == null || sweetJson.trim().isEmpty()) {
+            return new ResponseEntity<>("Request body cannot be empty", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Sweet created successfully", HttpStatus.CREATED);
     }
 }
