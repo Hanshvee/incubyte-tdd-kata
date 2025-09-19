@@ -29,6 +29,10 @@ public class SweetsController {
                 return new ResponseEntity<>("Sweet price is required and must be a valid number",
                         HttpStatus.BAD_REQUEST);
             }
+
+            if (!jsonObject.has("description") || jsonObject.getString("description").trim().isEmpty()) {
+                return new ResponseEntity<>("Sweet description is required", HttpStatus.BAD_REQUEST);
+            }
         } catch (JSONException e) {
             return new ResponseEntity<>("Invalid JSON format", HttpStatus.BAD_REQUEST);
         }
