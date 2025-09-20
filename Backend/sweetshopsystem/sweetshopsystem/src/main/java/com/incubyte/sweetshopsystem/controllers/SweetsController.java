@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated; // Added import for 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,6 +66,25 @@ public class SweetsController {
     public ResponseEntity<Sweet> getSweetById(@PathVariable Long id) {
         return sweetService.getSweetById(id)
                 .map(sweet -> new ResponseEntity<>(sweet, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Sweet> updateSweet(
+            @PathVariable Long id,
+            @Validated({ Default.class, ImageUrlValidationGroup.class }) @RequestBody SweetRequestDTO sweetRequestDTO) {
+        return sweetService.getSweetById(id)
+                .map(existingSweet -> {
+                    existingSweet.setName(sweetRequestDTO.getName());
+                    existingSweet.setDescription(sweetRequestDTO.getDescription());
+                    existingSweet.setPrice(
+                            sweetRequestDTO.getPrice() != null ? sweetRequestDTO.getPrice() : existingSweet.getPrice());
+                    existingSweet.setCategory_id(sweetRequestDTO.getCategory_id());
+                    existingSweet.setStock_quantity(sweetRequestDTO.getStock_quantity());
+                    existingSweet.setImage_url(sweetRequestDTO.getImage_url());
+                    Sweet updatedSweet = sweetService.save(existingSweet);
+                    return new ResponseEntity<>(updatedSweet, HttpStatus.OK);
+                })
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
