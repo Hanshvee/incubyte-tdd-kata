@@ -5,6 +5,7 @@ import com.incubyte.sweetshopsystem.service.SweetService;
 import com.incubyte.sweetshopsystem.dto.SweetRequestDTO; // Added import
 import com.incubyte.sweetshopsystem.dto.ImageUrlValidationGroup; // Added import for validation groups
 import jakarta.validation.Valid; // Added import
+import jakarta.validation.groups.Default;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated; // Added import for @Validated on class level
@@ -37,7 +38,7 @@ public class SweetsController {
 
     @PostMapping
     public ResponseEntity<String> createSweet(
-            @Validated(ImageUrlValidationGroup.class) @RequestBody SweetRequestDTO sweetRequestDTO) {
+            @Validated({ Default.class, ImageUrlValidationGroup.class }) @RequestBody SweetRequestDTO sweetRequestDTO) {
         // Map DTO to Sweet entity
         Sweet sweet = new Sweet(sweetRequestDTO.getName(),
                 sweetRequestDTO.getDescription(),
