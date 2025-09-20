@@ -31,7 +31,6 @@ public class SweetService {
     }
 
     public List<Sweet> searchSweets(String name, String category, BigDecimal minPrice, BigDecimal maxPrice) {
-        // Placeholder for now, actual search logic will be implemented in the repository
-        return Collections.emptyList();
+        return sweetRepository.findSweetsByCriteria(name, category, minPrice, maxPrice);
     }
 }
