@@ -42,7 +42,8 @@ public class SweetsController {
         // Map DTO to Sweet entity
         Sweet sweet = new Sweet(sweetRequestDTO.getName(),
                 sweetRequestDTO.getDescription(),
-                sweetRequestDTO.getPrice().doubleValue(), // Convert BigDecimal to double
+                sweetRequestDTO.getPrice() != null ? sweetRequestDTO.getPrice().doubleValue() : 0.0, // Handle null
+                                                                                                     // price
                 sweetRequestDTO.getCategory_id(),
                 sweetRequestDTO.getStock_quantity(),
                 sweetRequestDTO.getImage_url());

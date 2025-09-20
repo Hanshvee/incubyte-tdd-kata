@@ -15,8 +15,7 @@ public class SweetRequestDTO {
     @NotBlank(message = "Sweet description is required") // Re-added @NotBlank
     private String description;
 
-    @NotNull(message = "Sweet price is required")
-    @DecimalMin(value = "0.01", message = "Sweet price must be greater than 0")
+    // Temporarily removed @NotNull and @DecimalMin for Red Phase
     private BigDecimal price;
 
     @NotNull(message = "Sweet category ID is required")
