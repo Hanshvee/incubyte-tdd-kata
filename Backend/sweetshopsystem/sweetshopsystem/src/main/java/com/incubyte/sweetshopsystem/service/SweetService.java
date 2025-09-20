@@ -33,4 +33,8 @@ public class SweetService {
     public List<Sweet> searchSweets(String name, String category, BigDecimal minPrice, BigDecimal maxPrice) {
         return sweetRepository.findSweetsByCriteria(name, category, minPrice, maxPrice);
     }
+
+    public void deleteSweet(Long id) {
+        sweetRepository.deleteById(id);
+    }
 }
