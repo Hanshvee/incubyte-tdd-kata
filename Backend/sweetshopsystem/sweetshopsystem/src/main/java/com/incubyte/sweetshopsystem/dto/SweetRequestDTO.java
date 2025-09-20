@@ -12,7 +12,7 @@ public class SweetRequestDTO {
     @NotBlank(message = "Sweet name is required")
     private String name;
 
-    @NotBlank(message = "Sweet description is required")
+    // Removed @NotBlank temporarily for Red Phase
     private String description;
 
     @NotNull(message = "Sweet price is required")
