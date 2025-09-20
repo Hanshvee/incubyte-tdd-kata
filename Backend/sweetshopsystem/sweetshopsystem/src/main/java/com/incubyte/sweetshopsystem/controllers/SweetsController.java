@@ -3,6 +3,7 @@ package com.incubyte.sweetshopsystem.controllers;
 import com.incubyte.sweetshopsystem.entity.Sweet;
 import com.incubyte.sweetshopsystem.service.SweetService;
 import com.incubyte.sweetshopsystem.dto.SweetRequestDTO;
+import com.incubyte.sweetshopsystem.dto.SweetResponseDTO;
 import com.incubyte.sweetshopsystem.dto.ImageUrlValidationGroup;
 import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
@@ -59,20 +60,20 @@ public class SweetsController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Sweet>> getAllSweets() {
-        List<Sweet> sweets = sweetService.getAllSweets();
+    public ResponseEntity<List<SweetResponseDTO>> getAllSweets() {
+        List<SweetResponseDTO> sweets = sweetService.getAllSweetsWithCategoryNames();
         return new ResponseEntity<>(sweets, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Sweet> getSweetById(@PathVariable Long id) {
-        return sweetService.getSweetById(id)
+    public ResponseEntity<SweetResponseDTO> getSweetById(@PathVariable Long id) {
+        return sweetService.getSweetByIdWithCategoryName(id)
                 .map(sweet -> new ResponseEntity<>(sweet, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Sweet> updateSweet(
+    public ResponseEntity<SweetResponseDTO> updateSweet(
             @PathVariable Long id,
             @Validated({ Default.class, ImageUrlValidationGroup.class }) @RequestBody SweetRequestDTO sweetRequestDTO) {
         return sweetService.getSweetById(id)
@@ -85,18 +86,20 @@ public class SweetsController {
                     existingSweet.setStock_quantity(sweetRequestDTO.getStock_quantity());
                     existingSweet.setImage_url(sweetRequestDTO.getImage_url());
                     Sweet updatedSweet = sweetService.save(existingSweet);
-                    return new ResponseEntity<>(updatedSweet, HttpStatus.OK);
+                    SweetResponseDTO responseDTO = sweetService.getSweetByIdWithCategoryName(updatedSweet.getId())
+                            .orElse(null);
+                    return new ResponseEntity<>(responseDTO, HttpStatus.OK);
                 })
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Sweet>> searchSweets(
+    public ResponseEntity<List<SweetResponseDTO>> searchSweets(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice) {
-        List<Sweet> sweets = sweetService.searchSweets(name, category, minPrice, maxPrice);
+        List<SweetResponseDTO> sweets = sweetService.searchSweetsWithCategoryNames(name, category, minPrice, maxPrice);
         return new ResponseEntity<>(sweets, HttpStatus.OK);
     }
 
