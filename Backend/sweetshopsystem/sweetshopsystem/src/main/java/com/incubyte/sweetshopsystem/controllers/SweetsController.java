@@ -117,6 +117,12 @@ public class SweetsController {
     public ResponseEntity<String> purchaseSweet(
             @PathVariable Long id,
             @RequestParam Integer quantity) {
+
+        // Input validation
+        if (quantity == null || quantity <= 0) {
+            return new ResponseEntity<>("Quantity must be a positive number", HttpStatus.BAD_REQUEST);
+        }
+
         try {
             Sweet updatedSweet = sweetService.purchaseSweet(id, quantity);
             return new ResponseEntity<>(

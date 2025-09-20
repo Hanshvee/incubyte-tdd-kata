@@ -85,4 +85,24 @@ public class SweetsControllerPurchaseSweetTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Insufficient stock. Available: 100, Requested: 150"));
     }
+
+    @Test
+    @DisplayName("should return 400 when quantity is zero or negative")
+    void shouldReturn400WhenQuantityIsZeroOrNegative() throws Exception {
+        Long sweetId = 1L;
+
+        // Test zero quantity
+        mockMvc.perform(post("/api/sweets/{id}/purchase", sweetId)
+                .param("quantity", "0")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Quantity must be a positive number"));
+
+        // Test negative quantity
+        mockMvc.perform(post("/api/sweets/{id}/purchase", sweetId)
+                .param("quantity", "-5")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Quantity must be a positive number"));
+    }
 }
