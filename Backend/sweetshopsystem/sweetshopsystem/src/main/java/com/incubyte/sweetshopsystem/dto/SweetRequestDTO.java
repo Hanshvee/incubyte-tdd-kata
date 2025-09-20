@@ -19,12 +19,11 @@ public class SweetRequestDTO {
     @DecimalMin(value = "0.01", message = "Sweet price must be greater than 0")
     private BigDecimal price;
 
-    @NotNull(message = "Sweet category ID is required") // Re-added @NotNull
-    @Min(value = 1, message = "Sweet category ID must be a positive integer") // Re-added @Min
+    @NotNull(message = "Sweet category ID is required")
+    @Min(value = 1, message = "Sweet category ID must be a positive integer")
     private Integer category_id;
 
-    @NotNull(message = "Sweet stock quantity is required")
-    @Min(value = 0, message = "Sweet stock quantity must be a non-negative integer")
+    // Temporarily removed @NotNull and @Min for Red Phase
     private Integer stock_quantity;
 
     @Pattern(regexp = "^(http|https)://[^\\s/$.?#].[^\\s]*$", message = "Sweet image URL has an invalid format", groups = {
