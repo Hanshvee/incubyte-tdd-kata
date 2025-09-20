@@ -2,13 +2,13 @@ package com.incubyte.sweetshopsystem.controllers;
 
 import com.incubyte.sweetshopsystem.entity.Sweet;
 import com.incubyte.sweetshopsystem.service.SweetService;
-import com.incubyte.sweetshopsystem.dto.SweetRequestDTO; // Added import
-import com.incubyte.sweetshopsystem.dto.ImageUrlValidationGroup; // Added import for validation groups
-import jakarta.validation.Valid; // Added import
+import com.incubyte.sweetshopsystem.dto.SweetRequestDTO;
+import com.incubyte.sweetshopsystem.dto.ImageUrlValidationGroup;
+import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated; // Added import for @Validated on class level
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,17 +20,18 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.AbstractMap; // Added import for AbstractMap.SimpleEntry
+import java.util.AbstractMap;
 import java.util.stream.Collectors;
-
-// Removed unused imports: import org.json.JSONObject; import org.json.JSONException;
 
 @RestController
 @RequestMapping("/api/sweets")
-@Validated // Added @Validated for group validation
+@Validated
 public class SweetsController {
 
     private final SweetService sweetService;
@@ -57,8 +58,8 @@ public class SweetsController {
     }
 
     @GetMapping
-    public ResponseEntity<java.util.List<Sweet>> getAllSweets() {
-        java.util.List<Sweet> sweets = sweetService.getAllSweets();
+    public ResponseEntity<List<Sweet>> getAllSweets() {
+        List<Sweet> sweets = sweetService.getAllSweets();
         return new ResponseEntity<>(sweets, HttpStatus.OK);
     }
 
@@ -77,8 +78,8 @@ public class SweetsController {
                 .map(existingSweet -> {
                     existingSweet.setName(sweetRequestDTO.getName());
                     existingSweet.setDescription(sweetRequestDTO.getDescription());
-                    existingSweet.setPrice(
-                            sweetRequestDTO.getPrice() != null ? sweetRequestDTO.getPrice() : existingSweet.getPrice());
+                    existingSweet.setPrice(sweetRequestDTO.getPrice() != null ? sweetRequestDTO.getPrice()
+                            : existingSweet.getPrice());
                     existingSweet.setCategory_id(sweetRequestDTO.getCategory_id());
                     existingSweet.setStock_quantity(sweetRequestDTO.getStock_quantity());
                     existingSweet.setImage_url(sweetRequestDTO.getImage_url());
@@ -86,6 +87,16 @@ public class SweetsController {
                     return new ResponseEntity<>(updatedSweet, HttpStatus.OK);
                 })
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Sweet>> searchSweets(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice) {
+        List<Sweet> sweets = sweetService.searchSweets(name, category, minPrice, maxPrice);
+        return new ResponseEntity<>(sweets, HttpStatus.OK);
     }
 
     // Removed all manual validation methods: isValidImageUrl, isValidStockQuantity,

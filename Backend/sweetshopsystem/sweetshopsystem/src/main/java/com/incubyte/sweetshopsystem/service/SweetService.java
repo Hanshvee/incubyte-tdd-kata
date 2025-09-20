@@ -4,6 +4,11 @@ import com.incubyte.sweetshopsystem.entity.Sweet;
 import com.incubyte.sweetshopsystem.repository.SweetRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class SweetService {
 
@@ -17,11 +22,16 @@ public class SweetService {
         return sweetRepository.save(sweet);
     }
 
-    public java.util.List<Sweet> getAllSweets() {
+    public List<Sweet> getAllSweets() {
         return sweetRepository.findAll();
     }
 
-    public java.util.Optional<Sweet> getSweetById(Long id) {
+    public Optional<Sweet> getSweetById(Long id) {
         return sweetRepository.findById(id);
+    }
+
+    public List<Sweet> searchSweets(String name, String category, BigDecimal minPrice, BigDecimal maxPrice) {
+        // Placeholder for now, actual search logic will be implemented in the repository
+        return Collections.emptyList();
     }
 }
