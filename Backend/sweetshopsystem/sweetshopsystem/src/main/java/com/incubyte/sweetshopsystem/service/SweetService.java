@@ -8,6 +8,7 @@ import com.incubyte.sweetshopsystem.dto.SweetResponseDTO;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +44,21 @@ public class SweetService {
 
     public void deleteSweet(Long id) {
         sweetRepository.deleteById(id);
+    }
+
+    public Sweet purchaseSweet(Long id, Integer quantity) {
+        Sweet sweet = sweetRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Sweet not found with id: " + id));
+
+        if (sweet.getStock_quantity() < quantity) {
+            throw new IllegalArgumentException(
+                    "Insufficient stock. Available: " + sweet.getStock_quantity() + ", Requested: " + quantity);
+        }
+
+        sweet.setStock_quantity(sweet.getStock_quantity() - quantity);
+        sweet.setUpdated_at(LocalDateTime.now());
+
+        return sweetRepository.save(sweet);
     }
 
     // New methods for enhanced responses with category names

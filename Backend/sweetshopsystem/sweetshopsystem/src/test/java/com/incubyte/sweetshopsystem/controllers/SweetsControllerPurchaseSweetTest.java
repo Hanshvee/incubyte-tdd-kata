@@ -37,8 +37,12 @@ public class SweetsControllerPurchaseSweetTest {
                 "http://example.com/gulab.jpg");
         sweet.setId(sweetId);
 
+        Sweet updatedSweet = new Sweet("Gulab Jamun", "Traditional Indian sweet", 25.50, 40, 95,
+                "http://example.com/gulab.jpg");
+        updatedSweet.setId(sweetId);
+
         when(sweetService.getSweetById(sweetId)).thenReturn(Optional.of(sweet));
-        when(sweetService.purchaseSweet(sweetId, purchaseQuantity)).thenReturn(sweet);
+        when(sweetService.purchaseSweet(sweetId, purchaseQuantity)).thenReturn(updatedSweet);
 
         mockMvc.perform(post("/api/sweets/{id}/purchase", sweetId)
                 .param("quantity", purchaseQuantity.toString())
@@ -53,7 +57,8 @@ public class SweetsControllerPurchaseSweetTest {
         Long sweetId = 99L;
         Integer purchaseQuantity = 5;
 
-        when(sweetService.getSweetById(anyLong())).thenReturn(Optional.empty());
+        when(sweetService.purchaseSweet(sweetId, purchaseQuantity))
+                .thenThrow(new IllegalArgumentException("Sweet not found with id: " + sweetId));
 
         mockMvc.perform(post("/api/sweets/{id}/purchase", sweetId)
                 .param("quantity", purchaseQuantity.toString())

@@ -113,6 +113,24 @@ public class SweetsController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @PostMapping("/{id}/purchase")
+    public ResponseEntity<String> purchaseSweet(
+            @PathVariable Long id,
+            @RequestParam Integer quantity) {
+        try {
+            Sweet updatedSweet = sweetService.purchaseSweet(id, quantity);
+            return new ResponseEntity<>(
+                    "Sweet purchased successfully. Remaining stock: " + updatedSweet.getStock_quantity(),
+                    HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().contains("Sweet not found")) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            } else {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
     // Removed all manual validation methods: isValidImageUrl, isValidStockQuantity,
     // isValidCategoryId, isValidPrice
 }
