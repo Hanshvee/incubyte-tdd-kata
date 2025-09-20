@@ -9,6 +9,7 @@ import jakarta.validation.groups.Default;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated; // Added import for @Validated on class level
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +52,12 @@ public class SweetsController {
         sweetService.save(sweet);
 
         return new ResponseEntity<>("Sweet created successfully", HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<java.util.List<Sweet>> getAllSweets() {
+        java.util.List<Sweet> sweets = sweetService.getAllSweets();
+        return new ResponseEntity<>(sweets, HttpStatus.OK);
     }
 
     // Removed all manual validation methods: isValidImageUrl, isValidStockQuantity,

@@ -16,4 +16,8 @@ public class SweetService {
     public Sweet save(Sweet sweet) {
         return sweetRepository.save(sweet);
     }
+
+    public java.util.List<Sweet> getAllSweets() {
+        return sweetRepository.findAll();
+    }
 }
