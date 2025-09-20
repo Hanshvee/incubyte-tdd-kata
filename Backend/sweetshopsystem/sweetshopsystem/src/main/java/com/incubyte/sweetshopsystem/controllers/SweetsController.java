@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated; // Added import for @Validated on class level
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,6 +59,13 @@ public class SweetsController {
     public ResponseEntity<java.util.List<Sweet>> getAllSweets() {
         java.util.List<Sweet> sweets = sweetService.getAllSweets();
         return new ResponseEntity<>(sweets, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Sweet> getSweetById(@PathVariable Long id) {
+        return sweetService.getSweetById(id)
+                .map(sweet -> new ResponseEntity<>(sweet, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     // Removed all manual validation methods: isValidImageUrl, isValidStockQuantity,

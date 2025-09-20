@@ -20,4 +20,8 @@ public class SweetService {
     public java.util.List<Sweet> getAllSweets() {
         return sweetRepository.findAll();
     }
+
+    public java.util.Optional<Sweet> getSweetById(Long id) {
+        return sweetRepository.findById(id);
+    }
 }
