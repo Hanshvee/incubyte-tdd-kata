@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -15,13 +16,29 @@ public class Sweet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, length = 255)
     private String name;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+
+    @Column(name = "category_id", nullable = false)
     private Integer category_id;
+
+    @Column(name = "stock_quantity", nullable = false)
     private Integer stock_quantity;
+
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String image_url;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime created_at;
+
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updated_at;
 
     public Sweet() {
@@ -110,11 +127,13 @@ public class Sweet {
     public void setUpdated_at(LocalDateTime updated_at) {
         this.updated_at = updated_at;
     }
-    
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Sweet sweet = (Sweet) o;
         return id != null && id.equals(sweet.id);
     }
