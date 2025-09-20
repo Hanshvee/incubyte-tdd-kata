@@ -27,8 +27,7 @@ public class SweetRequestDTO {
     @Min(value = 0, message = "Sweet stock quantity must be a non-negative integer")
     private Integer stock_quantity;
 
-    @Pattern(regexp = "^(http|https)://[^\\s/$.?#].[^\\s]*$", message = "Sweet image URL has an invalid format", groups = {
-            ImageUrlValidationGroup.class }, flags = Pattern.Flag.CASE_INSENSITIVE)
+    // Temporarily removed @Pattern for Red Phase
     private String image_url;
 
     public SweetRequestDTO() {
