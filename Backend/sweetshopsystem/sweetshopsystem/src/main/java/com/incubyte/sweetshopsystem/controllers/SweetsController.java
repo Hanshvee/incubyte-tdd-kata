@@ -137,6 +137,30 @@ public class SweetsController {
         }
     }
 
+    @PostMapping("/{id}/restock")
+    public ResponseEntity<String> restockSweet(
+            @PathVariable Long id,
+            @RequestParam Integer quantity) {
+
+        // Input validation
+        if (quantity == null || quantity <= 0) {
+            return new ResponseEntity<>("Quantity must be a positive number", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Sweet updatedSweet = sweetService.restockSweet(id, quantity);
+            return new ResponseEntity<>(
+                    "Sweet restocked successfully. New stock: " + updatedSweet.getStock_quantity(),
+                    HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().contains("Sweet not found")) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            } else {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
     // Removed all manual validation methods: isValidImageUrl, isValidStockQuantity,
     // isValidCategoryId, isValidPrice
 }

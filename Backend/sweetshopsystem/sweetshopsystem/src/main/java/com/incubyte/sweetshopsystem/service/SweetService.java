@@ -61,6 +61,16 @@ public class SweetService {
         return sweetRepository.save(sweet);
     }
 
+    public Sweet restockSweet(Long id, Integer quantity) {
+        Sweet sweet = sweetRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Sweet not found with id: " + id));
+
+        sweet.setStock_quantity(sweet.getStock_quantity() + quantity);
+        sweet.setUpdated_at(LocalDateTime.now());
+
+        return sweetRepository.save(sweet);
+    }
+
     // New methods for enhanced responses with category names
     public List<SweetResponseDTO> getAllSweetsWithCategoryNames() {
         List<Sweet> sweets = sweetRepository.findAll();
