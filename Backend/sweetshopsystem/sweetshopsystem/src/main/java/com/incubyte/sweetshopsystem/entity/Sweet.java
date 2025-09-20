@@ -15,6 +15,7 @@ public class Sweet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "sweet_id")
     private Long id;
 
     @Column(nullable = false, length = 255)
