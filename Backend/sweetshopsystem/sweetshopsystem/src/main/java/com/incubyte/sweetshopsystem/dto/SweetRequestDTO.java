@@ -15,12 +15,12 @@ public class SweetRequestDTO {
     @NotBlank(message = "Sweet description is required")
     private String description;
 
-    @NotNull(message = "Sweet price is required") // Re-added @NotNull
-    @DecimalMin(value = "0.01", message = "Sweet price must be greater than 0") // Re-added @DecimalMin
+    @NotNull(message = "Sweet price is required")
+    @DecimalMin(value = "0.01", message = "Sweet price must be greater than 0")
     private BigDecimal price;
 
-    @NotNull(message = "Sweet category ID is required")
-    @Min(value = 1, message = "Sweet category ID must be a positive integer")
+    @NotNull(message = "Sweet category ID is required") // Re-added @NotNull
+    @Min(value = 1, message = "Sweet category ID must be a positive integer") // Re-added @Min
     private Integer category_id;
 
     @NotNull(message = "Sweet stock quantity is required")
