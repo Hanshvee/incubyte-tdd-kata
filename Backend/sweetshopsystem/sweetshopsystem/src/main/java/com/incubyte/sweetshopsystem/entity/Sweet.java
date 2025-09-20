@@ -44,7 +44,8 @@ public class Sweet {
     public Sweet() {
     }
 
-    public Sweet(String name, String description, double price, Integer category_id, Integer stock_quantity, String image_url) {
+    public Sweet(String name, String description, double price, Integer category_id, Integer stock_quantity,
+            String image_url) {
         this.name = name;
         this.description = description;
         this.price = BigDecimal.valueOf(price);
