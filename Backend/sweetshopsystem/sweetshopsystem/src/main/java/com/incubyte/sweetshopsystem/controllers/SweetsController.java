@@ -43,21 +43,30 @@ public class SweetsController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createSweet(
-            @Validated({ Default.class, ImageUrlValidationGroup.class }) @RequestBody SweetRequestDTO sweetRequestDTO) {
-        // Map DTO to Sweet entity
-        Sweet sweet = new Sweet(sweetRequestDTO.getName(),
-                sweetRequestDTO.getDescription(),
-                sweetRequestDTO.getPrice() != null ? sweetRequestDTO.getPrice().doubleValue() : 0.0, // Handle null
-                                                                                                     // price
-                sweetRequestDTO.getCategory_id(),
-                sweetRequestDTO.getStock_quantity(),
-                sweetRequestDTO.getImage_url());
+public ResponseEntity<SweetResponseDTO> createSweet(
+        @Validated({ Default.class, ImageUrlValidationGroup.class }) @RequestBody SweetRequestDTO sweetRequestDTO) {
 
-        sweetService.save(sweet);
+    // Map DTO to Sweet entity
+    Sweet sweet = new Sweet(
+        sweetRequestDTO.getName(),
+        sweetRequestDTO.getDescription(),
+        sweetRequestDTO.getPrice() != null ? sweetRequestDTO.getPrice().doubleValue() : 0.0,
+        sweetRequestDTO.getCategory_id(),
+        sweetRequestDTO.getStock_quantity(),
+        sweetRequestDTO.getImage_url()
+    );
 
-        return new ResponseEntity<>("Sweet created successfully", HttpStatus.CREATED);
-    }
+    // Save sweet
+    Sweet savedSweet = sweetService.save(sweet);
+
+    // Map saved entity to ResponseDTO
+    SweetResponseDTO responseDTO = sweetService.getSweetByIdWithCategoryName(savedSweet.getId())
+                                              .orElseThrow(() -> new RuntimeException("Sweet not found after save"));
+
+    // Return created sweet as JSON
+    return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+}
+
 
     @GetMapping
     public ResponseEntity<List<SweetResponseDTO>> getAllSweets() {
@@ -178,5 +187,13 @@ class ValidationExceptionHandler {
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    // Global handler for all other exceptions to ensure JSON response
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleAllExceptions(Exception ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred");
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
