@@ -1,6 +1,6 @@
 package com.incubyte.sweetshopsystem.controllers;
 
-import com.incubyte.sweetshopsystem.entity.Sweet;
+import com.incubyte.sweetshopsystem.dto.SweetResponseDTO;
 import com.incubyte.sweetshopsystem.service.SweetService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,10 +35,12 @@ public class SweetsControllerSearchSweetsTest {
     @DisplayName("should return sweets by name search term")
     void shouldReturnSweetsByNameSearchTerm() throws Exception {
         String searchTerm = "Laddu";
-        Sweet sweet = new Sweet("Laddu", "Traditional Indian sweet", 150.0, 1, 100, "http://example.com/laddu.jpg");
-        List<Sweet> sweets = Collections.singletonList(sweet);
+        SweetResponseDTO sweet = new SweetResponseDTO(1L, "Laddu", "Traditional Indian sweet", 
+                new BigDecimal(150.0), 1, "Traditional", 100, 
+                "http://example.com/laddu.jpg", LocalDateTime.now(), LocalDateTime.now());
+        List<SweetResponseDTO> sweets = Collections.singletonList(sweet);
 
-        when(sweetService.searchSweets(anyString(), any(), any(), any())).thenReturn(sweets);
+        when(sweetService.searchSweetsWithCategoryNames(anyString(), any(), any(), any())).thenReturn(sweets);
 
         mockMvc.perform(get("/api/sweets/search")
                 .param("name", searchTerm)
@@ -51,11 +54,15 @@ public class SweetsControllerSearchSweetsTest {
     @DisplayName("should return sweets by category search term")
     void shouldReturnSweetsByCategorySearchTerm() throws Exception {
         String categoryTerm = "Traditional";
-        Sweet sweet1 = new Sweet("Laddu", "Traditional Indian sweet", 150.0, 1, 100, "http://example.com/laddu.jpg");
-        Sweet sweet2 = new Sweet("Gulab Jamun", "Traditional dessert", 200.0, 1, 50, "http://example.com/gulab.jpg");
-        List<Sweet> sweets = List.of(sweet1, sweet2);
+        SweetResponseDTO sweet1 = new SweetResponseDTO(1L, "Laddu", "Traditional Indian sweet", 
+                new BigDecimal(150.0), 1, "Traditional", 100, 
+                "http://example.com/laddu.jpg", LocalDateTime.now(), LocalDateTime.now());
+        SweetResponseDTO sweet2 = new SweetResponseDTO(2L, "Gulab Jamun", "Traditional dessert", 
+                new BigDecimal(200.0), 1, "Traditional", 50, 
+                "http://example.com/gulab.jpg", LocalDateTime.now(), LocalDateTime.now());
+        List<SweetResponseDTO> sweets = List.of(sweet1, sweet2);
 
-        when(sweetService.searchSweets(any(), anyString(), any(), any())).thenReturn(sweets);
+        when(sweetService.searchSweetsWithCategoryNames(any(), anyString(), any(), any())).thenReturn(sweets);
 
         mockMvc.perform(get("/api/sweets/search")
                 .param("category", categoryTerm)
@@ -71,10 +78,12 @@ public class SweetsControllerSearchSweetsTest {
     void shouldReturnSweetsByPriceRange() throws Exception {
         BigDecimal minPrice = new BigDecimal("100.00");
         BigDecimal maxPrice = new BigDecimal("200.00");
-        Sweet sweet = new Sweet("Laddu", "Traditional Indian sweet", 150.0, 1, 100, "http://example.com/laddu.jpg");
-        List<Sweet> sweets = Collections.singletonList(sweet);
+        SweetResponseDTO sweet = new SweetResponseDTO(1L, "Laddu", "Traditional Indian sweet", 
+                new BigDecimal(150.0), 1, "Traditional", 100, 
+                "http://example.com/laddu.jpg", LocalDateTime.now(), LocalDateTime.now());
+        List<SweetResponseDTO> sweets = Collections.singletonList(sweet);
 
-        when(sweetService.searchSweets(any(), any(), any(), any())).thenReturn(sweets);
+        when(sweetService.searchSweetsWithCategoryNames(any(), any(), any(), any())).thenReturn(sweets);
 
         mockMvc.perform(get("/api/sweets/search")
                 .param("minPrice", minPrice.toString())
@@ -91,10 +100,12 @@ public class SweetsControllerSearchSweetsTest {
         String name = "Laddu";
         String category = "Traditional";
         BigDecimal minPrice = new BigDecimal("100.00");
-        Sweet sweet = new Sweet("Laddu", "Traditional Indian sweet", 150.0, 1, 100, "http://example.com/laddu.jpg");
-        List<Sweet> sweets = Collections.singletonList(sweet);
+        SweetResponseDTO sweet = new SweetResponseDTO(1L, "Laddu", "Traditional Indian sweet", 
+                new BigDecimal(150.0), 1, "Traditional", 100, 
+                "http://example.com/laddu.jpg", LocalDateTime.now(), LocalDateTime.now());
+        List<SweetResponseDTO> sweets = Collections.singletonList(sweet);
 
-        when(sweetService.searchSweets(anyString(), anyString(), any(), any())).thenReturn(sweets);
+        when(sweetService.searchSweetsWithCategoryNames(anyString(), anyString(), any(), any())).thenReturn(sweets);
 
         mockMvc.perform(get("/api/sweets/search")
                 .param("name", name)
@@ -110,9 +121,9 @@ public class SweetsControllerSearchSweetsTest {
     @DisplayName("should return empty list when no sweets match search criteria")
     void shouldReturnEmptyListWhenNoSweetsMatchSearchCriteria() throws Exception {
         String searchTerm = "NonExistentSweet";
-        List<Sweet> sweets = Collections.emptyList();
+        List<SweetResponseDTO> sweets = Collections.emptyList();
 
-        when(sweetService.searchSweets(anyString(), any(), any(), any())).thenReturn(sweets);
+        when(sweetService.searchSweetsWithCategoryNames(anyString(), any(), any(), any())).thenReturn(sweets);
 
         mockMvc.perform(get("/api/sweets/search")
                 .param("name", searchTerm)
@@ -124,11 +135,15 @@ public class SweetsControllerSearchSweetsTest {
     @Test
     @DisplayName("should return all sweets when no search parameters provided")
     void shouldReturnAllSweetsWhenNoSearchParametersProvided() throws Exception {
-        Sweet sweet1 = new Sweet("Laddu", "Traditional Indian sweet", 150.0, 1, 100, "http://example.com/laddu.jpg");
-        Sweet sweet2 = new Sweet("Gulab Jamun", "Traditional dessert", 200.0, 1, 50, "http://example.com/gulab.jpg");
-        List<Sweet> sweets = List.of(sweet1, sweet2);
+        SweetResponseDTO sweet1 = new SweetResponseDTO(1L, "Laddu", "Traditional Indian sweet", 
+                new BigDecimal(150.0), 1, "Traditional", 100, 
+                "http://example.com/laddu.jpg", LocalDateTime.now(), LocalDateTime.now());
+        SweetResponseDTO sweet2 = new SweetResponseDTO(2L, "Gulab Jamun", "Traditional dessert", 
+                new BigDecimal(200.0), 1, "Traditional", 50, 
+                "http://example.com/gulab.jpg", LocalDateTime.now(), LocalDateTime.now());
+        List<SweetResponseDTO> sweets = List.of(sweet1, sweet2);
 
-        when(sweetService.searchSweets(any(), any(), any(), any())).thenReturn(sweets);
+        when(sweetService.searchSweetsWithCategoryNames(any(), any(), any(), any())).thenReturn(sweets);
 
         mockMvc.perform(get("/api/sweets/search")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -136,5 +151,16 @@ public class SweetsControllerSearchSweetsTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].name").value("Laddu"))
                 .andExpect(jsonPath("$[1].name").value("Gulab Jamun"));
+    }
+
+    // Added missing import
+    @Test
+    @DisplayName("should handle invalid input gracefully")
+    void shouldHandleInvalidInputGracefully() throws Exception {
+        // Test with invalid price format
+        mockMvc.perform(get("/api/sweets/search")
+                .param("minPrice", "invalid-price")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

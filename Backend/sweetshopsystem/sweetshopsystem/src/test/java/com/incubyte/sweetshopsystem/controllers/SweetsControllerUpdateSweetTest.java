@@ -3,6 +3,7 @@ package com.incubyte.sweetshopsystem.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.incubyte.sweetshopsystem.dto.SweetRequestDTO;
+import com.incubyte.sweetshopsystem.dto.SweetResponseDTO;
 import com.incubyte.sweetshopsystem.entity.Sweet;
 import com.incubyte.sweetshopsystem.service.SweetService;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -46,9 +48,25 @@ public class SweetsControllerUpdateSweetTest {
                 Sweet savedSweet = new Sweet("Updated Laddu", "Updated description", 180.0, 2, 120,
                                 "http://example.com/updated_laddu.jpg");
                 savedSweet.setId(sweetId);
+                
+                // Create a SweetResponseDTO matching the expected response
+                SweetResponseDTO responseDTO = new SweetResponseDTO(
+                        sweetId,
+                        "Updated Laddu",
+                        "Updated description",
+                        BigDecimal.valueOf(180.0),
+                        2,
+                        "Category Name",
+                        120,
+                        "http://example.com/updated_laddu.jpg",
+                        LocalDateTime.now(),
+                        LocalDateTime.now()
+                );
 
                 when(sweetService.getSweetById(sweetId)).thenReturn(Optional.of(existingSweet));
                 when(sweetService.save(any(Sweet.class))).thenReturn(savedSweet);
+                // Mock the additional method call that's in the controller
+                when(sweetService.getSweetByIdWithCategoryName(sweetId)).thenReturn(Optional.of(responseDTO));
 
                 mockMvc.perform(put("/api/sweets/{id}", sweetId)
                                 .contentType(MediaType.APPLICATION_JSON)

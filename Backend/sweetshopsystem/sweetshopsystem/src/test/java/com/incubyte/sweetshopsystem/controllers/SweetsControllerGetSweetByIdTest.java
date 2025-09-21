@@ -1,6 +1,6 @@
 package com.incubyte.sweetshopsystem.controllers;
 
-import com.incubyte.sweetshopsystem.entity.Sweet;
+import com.incubyte.sweetshopsystem.dto.SweetResponseDTO;
 import com.incubyte.sweetshopsystem.service.SweetService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
@@ -31,8 +32,22 @@ public class SweetsControllerGetSweetByIdTest {
     @DisplayName("should return a sweet by ID when it exists")
     void shouldReturnSweetByIdWhenItExists() throws Exception {
         Long sweetId = 1L;
-        Sweet sweet = new Sweet("Laddu", "Traditional Indian sweet", 150.0, 1, 100, "http://example.com/laddu.jpg");
-        when(sweetService.getSweetById(sweetId)).thenReturn(Optional.of(sweet));
+        // Create a SweetResponseDTO matching what the controller returns
+        SweetResponseDTO sweet = new SweetResponseDTO(
+            sweetId,
+            "Laddu",
+            "Traditional Indian sweet",
+            BigDecimal.valueOf(150.0),
+            1,
+            "Category Name",
+            100,
+            "http://example.com/laddu.jpg",
+            LocalDateTime.now(),
+            LocalDateTime.now()
+        );
+        
+        // Mock the method that the controller actually calls
+        when(sweetService.getSweetByIdWithCategoryName(sweetId)).thenReturn(Optional.of(sweet));
 
         mockMvc.perform(get("/api/sweets/{id}", sweetId)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -49,7 +64,8 @@ public class SweetsControllerGetSweetByIdTest {
     @DisplayName("should return 404 Not Found when sweet ID does not exist")
     void shouldReturnNotFoundWhenSweetIdDoesNotExist() throws Exception {
         Long sweetId = 99L;
-        when(sweetService.getSweetById(sweetId)).thenReturn(Optional.empty());
+        // Mock the method that the controller actually calls
+        when(sweetService.getSweetByIdWithCategoryName(sweetId)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/sweets/{id}", sweetId)
                 .contentType(MediaType.APPLICATION_JSON))
