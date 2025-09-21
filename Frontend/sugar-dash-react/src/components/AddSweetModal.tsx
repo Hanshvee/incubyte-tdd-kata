@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { fetchCategories, Category } from '@/lib/categoryApi';
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,23 @@ export function AddSweetModal({ isOpen, onClose, onConfirm }: AddSweetModalProps
     image_url: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  useEffect(() => {
+    console.log('AddSweetModal mounted, fetching categories...');
+    setLoadingCategories(true);
+    fetchCategories()
+      .then(data => {
+        console.log('Fetched categories:', data);
+        setCategories(data);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch categories', err);
+        setCategories([]);
+      })
+      .finally(() => setLoadingCategories(false));
+  }, []);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -39,7 +57,7 @@ export function AddSweetModal({ isOpen, onClose, onConfirm }: AddSweetModalProps
     }
     
     if (!formData.category_id || formData.category_id <= 0) {
-      newErrors.category_id = 'Category ID is required';
+      newErrors.category_id = 'Category is required';
     }
     
     if (!formData.description.trim()) {
@@ -124,15 +142,19 @@ export function AddSweetModal({ isOpen, onClose, onConfirm }: AddSweetModalProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category_id">Category ID *</Label>
-            <Input
+            <Label htmlFor="category_id">Category *</Label>
+            <select
               id="category_id"
-              type="number"
-              min="1"
               value={formData.category_id}
-              onChange={(e) => handleInputChange('category_id', Number(e.target.value))}
-              placeholder="e.g., 1, 2, 3"
-            />
+              onChange={e => handleInputChange('category_id', Number(e.target.value))}
+              className="w-full border rounded px-3 py-2"
+              disabled={loadingCategories}
+            >
+              <option value={0}>Select a category</option>
+              {categories.map(cat => (
+                <option key={cat.category_id} value={cat.category_id}>{cat.name}</option>
+              ))}
+            </select>
             {errors.category_id && <p className="text-sm text-destructive">{errors.category_id}</p>}
           </div>
 

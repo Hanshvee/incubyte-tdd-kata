@@ -39,7 +39,7 @@ export function SweetCard({ sweet, onPurchase, onRestock, onDelete }: SweetCardP
             variant={isAvailable ? "default" : "secondary"}
             className={isAvailable ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"}
           >
-            {isAvailable ? "✅ Available" : "❌ Out of Stock"}
+            {isAvailable ? " Available" : " Out of Stock"}
           </Badge>
         </div>
       </CardHeader>
@@ -53,7 +53,7 @@ export function SweetCard({ sweet, onPurchase, onRestock, onDelete }: SweetCardP
           
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">Price:</span>
-            <span className="text-lg font-bold text-primary">₹{sweet.price}</span>
+            <span className="text-lg font-bold text-primary">₹{sweet.price} /kg</span>
           </div>
           
           <div className="flex items-center justify-between">

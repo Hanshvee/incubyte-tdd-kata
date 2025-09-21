@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import logo from '@/assets/Black Illustrative Indian Sweet Shop Logo.png';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -270,9 +271,17 @@ export default function Dashboard() {
       <header className="bg-gradient-primary text-primary-foreground shadow-sweet">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">Sweet Shop Admin</h1>
-              <p className="text-primary-foreground/80">Manage your delicious inventory</p>
+            <div className="flex items-center gap-4">
+              <img
+                src={logo}
+                alt="Sweet Shop Logo"
+                className="h-12 w-12 object-contain rounded-full bg-white p-1 shadow"
+                style={{ minWidth: 48 }}
+              />
+              <div>
+                <h1 className="text-3xl font-bold">Sweet Shop</h1>
+                <p className="text-primary-foreground/80">Spreading sweetness, one bite at a time.</p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <Button
