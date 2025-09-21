@@ -23,6 +23,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -35,7 +38,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/sweets")
 @Validated
 public class SweetsController {
-
+    private static final Logger logger = LoggerFactory.getLogger(SweetsController.class);
     private final SweetService sweetService;
 
     public SweetsController(SweetService sweetService) {
@@ -43,29 +46,25 @@ public class SweetsController {
     }
 
     @PostMapping
-public ResponseEntity<SweetResponseDTO> createSweet(
-        @Validated({ Default.class, ImageUrlValidationGroup.class }) @RequestBody SweetRequestDTO sweetRequestDTO) {
-
-    // Map DTO to Sweet entity
-    Sweet sweet = new Sweet(
-        sweetRequestDTO.getName(),
-        sweetRequestDTO.getDescription(),
-        sweetRequestDTO.getPrice() != null ? sweetRequestDTO.getPrice().doubleValue() : 0.0,
-        sweetRequestDTO.getCategory_id(),
-        sweetRequestDTO.getStock_quantity(),
-        sweetRequestDTO.getImage_url()
-    );
-
-    // Save sweet
-    Sweet savedSweet = sweetService.save(sweet);
-
-    // Map saved entity to ResponseDTO
-    SweetResponseDTO responseDTO = sweetService.getSweetByIdWithCategoryName(savedSweet.getId())
-                                              .orElseThrow(() -> new RuntimeException("Sweet not found after save"));
-
-    // Return created sweet as JSON
-    return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-}
+    public ResponseEntity<SweetResponseDTO> createSweet(
+            @Validated({ Default.class, ImageUrlValidationGroup.class }) @RequestBody SweetRequestDTO sweetRequestDTO) {
+        // Map DTO to Sweet entity
+        Sweet sweet = new Sweet(
+                sweetRequestDTO.getName(),
+                sweetRequestDTO.getDescription(),
+                sweetRequestDTO.getPrice() != null ? sweetRequestDTO.getPrice().doubleValue() : 0.0,
+                sweetRequestDTO.getCategory_id(),
+                sweetRequestDTO.getStock_quantity(),
+                sweetRequestDTO.getImage_url()
+        );
+        // Save sweet
+        Sweet savedSweet = sweetService.save(sweet);
+        // Map saved entity to ResponseDTO
+        SweetResponseDTO responseDTO = sweetService.getSweetByIdWithCategoryName(savedSweet.getId())
+                .orElseThrow(() -> new RuntimeException("Sweet not found after save"));
+        // Return created sweet as JSON
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    }
 
 
     @GetMapping
@@ -125,50 +124,70 @@ public ResponseEntity<SweetResponseDTO> createSweet(
     }
 
     @PostMapping("/{id}/purchase")
-    public ResponseEntity<String> purchaseSweet(
+    public ResponseEntity<Map<String, Object>> purchaseSweet(
             @PathVariable Long id,
-            @RequestParam Integer quantity) {
-
-        // Input validation
-        if (quantity == null || quantity <= 0) {
-            return new ResponseEntity<>("Quantity must be a positive number", HttpStatus.BAD_REQUEST);
+            @RequestBody(required = false) Map<String, Integer> body) {
+        Map<String, Object> response = new HashMap<>();
+        logger.info("Received purchase request for id {} with body: {}", id, body);
+        if (body == null || !body.containsKey("quantity")) {
+            response.put("error", "Missing 'quantity' in request body");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-
+        Integer quantity = body.get("quantity");
+        if (quantity == null || quantity <= 0) {
+            response.put("error", "Quantity must be a positive number");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
         try {
             Sweet updatedSweet = sweetService.purchaseSweet(id, quantity);
-            return new ResponseEntity<>(
-                    "Sweet purchased successfully. Remaining stock: " + updatedSweet.getStock_quantity(),
-                    HttpStatus.OK);
+            response.put("message", "Sweet purchased successfully. Remaining stock: " + updatedSweet.getStock_quantity());
+            response.put("sweet", sweetService.getSweetByIdWithCategoryName(updatedSweet.getId()).orElse(null));
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("Sweet not found")) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+                response.put("error", e.getMessage());
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
+        } catch (Exception ex) {
+            logger.error("Unexpected error in purchaseSweet", ex);
+            response.put("error", "Internal server error: " + ex.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/{id}/restock")
-    public ResponseEntity<String> restockSweet(
+    public ResponseEntity<Map<String, Object>> restockSweet(
             @PathVariable Long id,
-            @RequestParam Integer quantity) {
-
-        // Input validation
-        if (quantity == null || quantity <= 0) {
-            return new ResponseEntity<>("Quantity must be a positive number", HttpStatus.BAD_REQUEST);
+            @RequestBody(required = false) Map<String, Integer> body) {
+        Map<String, Object> response = new HashMap<>();
+        logger.info("Received restock request for id {} with body: {}", id, body);
+        if (body == null || !body.containsKey("quantity")) {
+            response.put("error", "Missing 'quantity' in request body");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-
+        Integer quantity = body.get("quantity");
+        if (quantity == null || quantity <= 0) {
+            response.put("error", "Quantity must be a positive number");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
         try {
             Sweet updatedSweet = sweetService.restockSweet(id, quantity);
-            return new ResponseEntity<>(
-                    "Sweet restocked successfully. New stock: " + updatedSweet.getStock_quantity(),
-                    HttpStatus.OK);
+            response.put("message", "Sweet restocked successfully. New stock: " + updatedSweet.getStock_quantity());
+            response.put("sweet", sweetService.getSweetByIdWithCategoryName(updatedSweet.getId()).orElse(null));
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("Sweet not found")) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             } else {
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+                response.put("error", e.getMessage());
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
+        } catch (Exception ex) {
+            logger.error("Unexpected error in restockSweet", ex);
+            response.put("error", "Internal server error: " + ex.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

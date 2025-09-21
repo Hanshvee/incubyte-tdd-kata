@@ -92,9 +92,8 @@ export default function Dashboard() {
   };
 
   const handlePurchaseConfirm = async (sweet: Sweet, quantity: number) => {
-    // Add to cart instead of immediate purchase
+    // Only update cart state, do not call backend
     const existingItem = cartItems.find(item => item.sweet.id === sweet.id);
-    
     if (existingItem) {
       const newQuantity = existingItem.quantity + quantity;
       if (newQuantity > sweet.stock_quantity) {
@@ -105,9 +104,9 @@ export default function Dashboard() {
         });
         return;
       }
-      setCartItems(prev => 
-        prev.map(item => 
-          item.sweet.id === sweet.id 
+      setCartItems(prev =>
+        prev.map(item =>
+          item.sweet.id === sweet.id
             ? { ...item, quantity: newQuantity }
             : item
         )
@@ -115,10 +114,9 @@ export default function Dashboard() {
     } else {
       setCartItems(prev => [...prev, { sweet, quantity }]);
     }
-
     toast({
       title: "Added to Cart",
-      description: `${quantity} ${sweet.name}(s) added to cart`,
+      description: `${quantity} ${sweet.name}(s) added to cart. Please check your cart to place the order.`,
     });
   };
 
@@ -128,16 +126,28 @@ export default function Dashboard() {
 
   const handleRestockConfirm = async (sweet: Sweet, quantity: number) => {
     try {
-      const updatedSweet = await apiService.restockSweet(sweet.id, quantity);
-      setSweets(prev => prev.map(s => s.id === sweet.id ? updatedSweet : s));
+      const response = await apiService.restockSweet(sweet.id, quantity);
+      if (response && response.sweet) {
+        setSweets(prev => prev.map(s => s.id === sweet.id ? response.sweet : s));
+      }
       toast({
-        title: "Success",
-        description: `${sweet.name} restocked with ${quantity} units`,
+        title: response && response.message ? "Success" : "Success",
+        description: response && response.message ? response.message : `${sweet.name} restocked with ${quantity} units`,
       });
-    } catch (error) {
+    } catch (error: any) {
+      let errorMsg = "Failed to restock sweet. Please try again.";
+      if (error instanceof Error && error.message) {
+        try {
+          const match = error.message.match(/\{.*\}/);
+          if (match) {
+            const parsed = JSON.parse(match[0]);
+            if (parsed.error) errorMsg = parsed.error;
+          }
+        } catch (_) {}
+      }
       toast({
         title: "Error",
-        description: "Failed to restock sweet. Please try again.",
+        description: errorMsg,
         variant: "destructive",
       });
     }
@@ -218,19 +228,16 @@ export default function Dashboard() {
 
   const handleCheckout = async () => {
     try {
-      // Process each cart item
+      // Process each cart item (call backend to reduce stock)
       for (const item of cartItems) {
         await apiService.purchaseSweet(item.sweet.id, item.quantity);
       }
-      
       // Update local sweet data
       const updatedSweets = await apiService.getAllSweets();
       setSweets(updatedSweets);
-      
       // Clear cart
       setCartItems([]);
       setCartModal(false);
-      
       toast({
         title: "Order Placed Successfully!",
         description: "All items have been purchased and stock updated",

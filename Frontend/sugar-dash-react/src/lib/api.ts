@@ -89,16 +89,16 @@ class ApiService {
   }
 
   // Purchase sweet (reduce stock)
-  async purchaseSweet(id: number, quantity: number): Promise<Sweet> {
-    return this.request<Sweet>(`/sweets/${id}/purchase`, {
+  async purchaseSweet(id: number, quantity: number): Promise<{ message: string; sweet: Sweet }> {
+    return this.request<{ message: string; sweet: Sweet }>(`/sweets/${id}/purchase`, {
       method: 'POST',
       body: JSON.stringify({ quantity }),
     });
   }
 
   // Restock sweet (increase stock)
-  async restockSweet(id: number, quantity: number): Promise<Sweet> {
-    return this.request<Sweet>(`/sweets/${id}/restock`, {
+  async restockSweet(id: number, quantity: number): Promise<{ message: string; sweet: Sweet }> {
+    return this.request<{ message: string; sweet: Sweet }>(`/sweets/${id}/restock`, {
       method: 'POST',
       body: JSON.stringify({ quantity }),
     });
