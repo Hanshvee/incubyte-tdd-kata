@@ -132,7 +132,7 @@ AI tools significantly optimized my development workflow by:
 
 ## 🎥 Demo
 
-- [Demo Video](https://drive.google.com/file/d/15fl6DO7fcn3tdwiiw-1ol8ulBkEIwEbe/preview" )
+- [Demo Video]( https://drive.google.com/file/d/15fl6DO7fcn3tdwiiw-1ol8ulBkEIwEbe/preview )
 
 ---
 
