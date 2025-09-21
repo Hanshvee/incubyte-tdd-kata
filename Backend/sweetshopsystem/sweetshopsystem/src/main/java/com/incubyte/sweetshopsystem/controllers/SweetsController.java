@@ -113,11 +113,13 @@ public ResponseEntity<SweetResponseDTO> createSweet(
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteSweet(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteSweet(@PathVariable Long id) {
         return sweetService.getSweetById(id)
                 .map(sweet -> {
                     sweetService.deleteSweet(id);
-                    return new ResponseEntity<>("Sweet deleted successfully", HttpStatus.OK);
+                    Map<String, String> response = new HashMap<>();
+                    response.put("message", "Sweet deleted successfully");
+                    return new ResponseEntity<>(response, HttpStatus.OK);
                 })
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }

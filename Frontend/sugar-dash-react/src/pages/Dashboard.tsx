@@ -152,10 +152,22 @@ export default function Dashboard() {
           title: "Success",
           description: `${sweet.name} has been deleted`,
         });
-      } catch (error) {
+      } catch (error: any) {
+        let errorMsg = "Failed to delete sweet. Please try again.";
+        // Try to extract backend error message if available
+        if (error instanceof Error && error.message) {
+          // If backend returns JSON error, try to parse it
+          try {
+            const match = error.message.match(/\{.*\}/);
+            if (match) {
+              const parsed = JSON.parse(match[0]);
+              if (parsed.error) errorMsg = parsed.error;
+            }
+          } catch (_) {}
+        }
         toast({
           title: "Error",
-          description: "Failed to delete sweet. Please try again.",
+          description: errorMsg,
           variant: "destructive",
         });
       }
